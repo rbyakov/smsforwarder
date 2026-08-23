@@ -10,17 +10,18 @@
   <img alt="UI" src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4">
 </p>
 
-The target SIM is identified by the trailing digits of its number (default
-`…8080`). Sending happens in the background over SMTP (Gmail) with retries. No
-analytics and no third-party SDKs — just Compose, WorkManager and JavaMail.
-Secrets are kept out of the repository.
+You pick the target SIM once in the app; it is remembered by its physical slot,
+so matching does not depend on VoLTE/IMS or on whether the carrier wrote the
+number onto the SIM. Sending happens in the background over SMTP (Gmail) with
+retries. No analytics and no third-party SDKs — just Compose, WorkManager and
+JavaMail. Secrets are kept out of the repository.
 
 ---
 
 ## ✨ Features
 
 - 📥 Catches incoming SMS via a `BroadcastReceiver`.
-- 🎯 Forwards only SMS from the target SIM (filter by number suffix).
+- 🎯 Forwards only SMS from the target SIM (pick it once, matched by slot).
 - 📧 Sends email over SMTP in the background, with retries on network failures.
 - 🔒 Never stores SMS and keeps no secrets in code or repository.
 - 🖥 A single Compose screen: status, permissions, SIM list, test, battery.
@@ -32,7 +33,7 @@ Secrets are kept out of the repository.
 |---|---|
 | `SmsReceiver` | Catches `SMS_RECEIVED`, joins multipart text, resolves `subId` (which SIM received it). If it matches the target SIM — enqueues a WorkManager job. Does not store the SMS. |
 | `ForwardWorker` | `CoroutineWorker`: builds the email (subject "SMS from \<sender\>", body: sender + time + text) and sends it over SMTP. Network error → `retry()`, auth error → `failure()`. |
-| `SimHelper` | Finds the target SIM's `subId` by number suffix via `SubscriptionManager` and returns the SIM list for the screen. Requires `READ_PHONE_STATE`. |
+| `SimHelper` | Maps the user-chosen slot to the active SIM's `subId` via `SubscriptionManager` and returns the SIM list for the screen. Resolves the number for display only (carrier → UICC → IMS). Requires `READ_PHONE_STATE` (+ `READ_PHONE_NUMBERS` for the number). |
 | `MainActivity` | The single Compose screen: status, permissions, info, SIM list, "Send test" and "Disable battery optimization" buttons. |
 | `Config` | Reads values from `BuildConfig`. |
 
@@ -41,7 +42,8 @@ Secrets are kept out of the repository.
 | Permission | Why | Type |
 |---|---|---|
 | `RECEIVE_SMS` | Catch incoming messages | runtime |
-| `READ_PHONE_STATE` | Read the SIM list to match by number | runtime |
+| `READ_PHONE_STATE` | Read the SIM list (slot, carrier) | runtime |
+| `READ_PHONE_NUMBERS` | Show each SIM's number (display only) | runtime |
 | `INTERNET` | Send the email | normal |
 
 Both runtime permissions are requested from the screen with the "Grant
@@ -61,8 +63,8 @@ injected into `BuildConfig` at build time (see `app/build.gradle.kts`).
    forwarder.smtpUser=your.sender@gmail.com
    forwarder.smtpPassword=xxxxxxxxxxxxxxxx   # see "app password" below
    forwarder.forwardTo=your.inbox@example.com
-   forwarder.targetSimSuffix=8080
    ```
+   The target SIM is chosen in the app (by slot), not here.
 
 > **⚠️ Gmail app password.** Your regular password won't work for SMTP. You need
 > an "App Password": Google Account → *Security* → *2-Step Verification* →
@@ -87,9 +89,10 @@ injected into `BuildConfig` at build time (see `app/build.gradle.kts`).
 
 ## ✅ Testing on a phone
 
-1. Install the app, open the screen, grant both permissions.
-2. In the SIM list the target SIM should be marked "forwarded ✓".
-   A yellow warning means the SIM number couldn't be identified (see below).
+1. Install the app, open the screen, grant the permissions.
+2. In the SIM list, tap the SIM you want to forward — it gets marked
+   "forwarded ✓". If no SIM is selected, a yellow warning shows and **all** SMS
+   are forwarded.
 3. Tap "Send test" — an email should arrive.
    *(The button is enabled only when SMTP and the recipient are configured.)*
 4. Send an SMS to the target SIM → it should reach your email; to the other SIM
@@ -99,8 +102,9 @@ injected into `BuildConfig` at build time (see `app/build.gradle.kts`).
 
 ### 🩺 If the SIM filter doesn't work
 
-Resolving `subId` from the intent is flaky on some firmwares. `SmsReceiver` logs
-all extras of the incoming SMS (tag `SmsReceiver` in `logcat`):
+The filter relies on the incoming SMS carrying a `subId`. Resolving it from the
+intent is flaky on some firmwares. `SmsReceiver` logs all extras of the incoming
+SMS (tag `SmsReceiver` in `logcat`):
 
 ```bash
 adb logcat -s SmsReceiver
@@ -109,8 +113,8 @@ adb logcat -s SmsReceiver
 Send test SMS to both SIMs and check which key carries `subId`. The supported
 keys are listed in `SmsReceiver.extractSubId`.
 
-> **Fallback:** if the target SIM isn't found or `subId` never arrives, **all**
-> incoming SMS are forwarded — the screen shows a yellow warning about this.
+> **Fallback:** if no SIM is selected, or the incoming `subId` never arrives,
+> **all** incoming SMS are forwarded — the screen shows a yellow warning.
 
 ## 📦 Dependencies
 

@@ -13,20 +13,22 @@
     <string name="grant_permissions">Grant permissions</string>
 
     <!-- Info block -->
-    <string name="info_forwarding_for">Forwarding SMS for number …%1$s</string>
+    <string name="info_forwarding_selected">Forwarding SMS from the selected SIM</string>
     <string name="info_sending_to">Sending to: %1$s</string>
     <string name="info_not_set">(not set)</string>
 
     <!-- SIM block -->
     <string name="sim_title">SIM cards</string>
+    <string name="sim_hint">Tap a SIM to forward its SMS</string>
     <string name="sim_no_access">No SIM access — grant permissions</string>
     <string name="sim_none">No active SIM found</string>
     <string name="sim_row">SIM %1$s (%2$s) — %3$s</string>
+    <string name="sim_slot">slot %1$d</string>
     <string name="sim_number_unknown">number unknown</string>
     <string name="sim_carrier_unknown">carrier unknown</string>
     <string name="sim_role_forwarded">forwarded ✓</string>
     <string name="sim_role_ignored">ignored</string>
-    <string name="sim_target_not_found">⚠ SIM with number …%1$s not found. Until it is identified, ALL incoming SMS are forwarded.</string>
+    <string name="sim_none_selected">⚠ No target SIM selected — ALL incoming SMS are forwarded. Tap a SIM above.</string>
 
     <!-- Buttons -->
     <string name="send_test">Send test</string>

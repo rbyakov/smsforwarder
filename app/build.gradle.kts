@@ -34,7 +34,6 @@ android {
         buildConfigField("String", "SMTP_USER", "\"${secret("forwarder.smtpUser")}\"")
         buildConfigField("String", "SMTP_PASSWORD", "\"${secret("forwarder.smtpPassword")}\"")
         buildConfigField("String", "FORWARD_TO", "\"${secret("forwarder.forwardTo")}\"")
-        buildConfigField("String", "TARGET_SIM_SUFFIX", "\"${secret("forwarder.targetSimSuffix", "8080")}\"")
     }
 
     buildTypes {

@@ -10,7 +10,6 @@ object Config {
     val smtpUser: String = BuildConfig.SMTP_USER
     val smtpPassword: String = BuildConfig.SMTP_PASSWORD
     val forwardTo: String = BuildConfig.FORWARD_TO
-    val targetSimSuffix: String = BuildConfig.TARGET_SIM_SUFFIX
 
     val isConfigured: Boolean
         get() = smtpUser.isNotBlank() && smtpPassword.isNotBlank() && forwardTo.isNotBlank()

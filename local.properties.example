@@ -13,8 +13,7 @@ forwarder.smtpPassword=
 # Where to forward SMS to.
 forwarder.forwardTo=
 
-# Trailing digits of the target SIM's number.
-forwarder.targetSimSuffix=8080
+# The target SIM is chosen in the app (by slot), not configured here.
 
 # Optional (defaults shown):
 # forwarder.smtpHost=smtp.gmail.com

@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -121,7 +123,10 @@ fun ForwarderScreen(modifier: Modifier = Modifier) {
         }
 
         InfoBlock()
-        SimBlock(state.simState)
+        SimBlock(state.simState) { slotIndex ->
+            SimHelper.setTargetSlot(context, slotIndex)
+            state = readState(context)
+        }
 
         Button(
             onClick = {
@@ -202,7 +207,7 @@ private fun InfoBlock() {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Text(stringResource(R.string.info_forwarding_for, Config.targetSimSuffix))
+            Text(stringResource(R.string.info_forwarding_selected))
             val recipient = Config.forwardTo.ifBlank { stringResource(R.string.info_not_set) }
             Text(stringResource(R.string.info_sending_to, recipient))
         }
@@ -210,7 +215,7 @@ private fun InfoBlock() {
 }
 
 @Composable
-private fun SimBlock(simState: SimState) {
+private fun SimBlock(simState: SimState, onSelect: (slotIndex: Int) -> Unit) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -222,26 +227,46 @@ private fun SimBlock(simState: SimState) {
                     Text(stringResource(R.string.sim_no_access), color = MaterialTheme.colorScheme.error)
                 simState.sims.isEmpty() ->
                     Text(stringResource(R.string.sim_none), color = MaterialTheme.colorScheme.error)
-                else -> simState.sims.forEach { sim ->
-                    val numberLabel = if (sim.number.isNotBlank()) {
-                        "…${sim.number.takeLast(4)}"
-                    } else {
-                        stringResource(R.string.sim_number_unknown)
-                    }
-                    val carrier = sim.carrier.ifBlank { stringResource(R.string.sim_carrier_unknown) }
-                    val role = stringResource(
-                        if (sim.isTarget) R.string.sim_role_forwarded else R.string.sim_role_ignored,
+                else -> {
+                    Text(
+                        stringResource(R.string.sim_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Text(stringResource(R.string.sim_row, numberLabel, carrier, role))
+                    simState.sims.forEach { sim -> SimRow(sim) { onSelect(sim.slotIndex) } }
                 }
             }
-            if (simState.hasPermission && !simState.targetFound) {
+            if (simState.hasPermission && simState.sims.isNotEmpty() && !simState.targetFound) {
                 Text(
-                    stringResource(R.string.sim_target_not_found, Config.targetSimSuffix),
+                    stringResource(R.string.sim_none_selected),
                     color = Color(0xFFB26A00),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SimRow(sim: SimCard, onClick: () -> Unit) {
+    val numberLabel = if (sim.number.isNotBlank()) {
+        "…${sim.number.takeLast(4)}"
+    } else {
+        stringResource(R.string.sim_slot, sim.slotIndex)
+    }
+    val carrier = sim.carrier.ifBlank { stringResource(R.string.sim_carrier_unknown) }
+    val role = stringResource(
+        if (sim.isTarget) R.string.sim_role_forwarded else R.string.sim_role_ignored,
+    )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(selected = sim.isTarget, onClick = onClick)
+        Spacer(Modifier.width(8.dp))
+        Text(stringResource(R.string.sim_row, numberLabel, carrier, role))
     }
 }

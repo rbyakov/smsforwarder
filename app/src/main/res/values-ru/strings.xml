@@ -13,20 +13,22 @@
     <string name="grant_permissions">Выдать разрешения</string>
 
     <!-- Info block -->
-    <string name="info_forwarding_for">Пересылаются SMS для номера …%1$s</string>
+    <string name="info_forwarding_selected">Пересылаются SMS с выбранной SIM</string>
     <string name="info_sending_to">Отправляется на: %1$s</string>
     <string name="info_not_set">(не настроено)</string>
 
     <!-- SIM block -->
     <string name="sim_title">SIM-карты</string>
+    <string name="sim_hint">Нажмите на SIM, чтобы пересылать её SMS</string>
     <string name="sim_no_access">Нет доступа к SIM — выдайте разрешения</string>
     <string name="sim_none">Активные SIM не найдены</string>
     <string name="sim_row">SIM %1$s (%2$s) — %3$s</string>
+    <string name="sim_slot">слот %1$d</string>
     <string name="sim_number_unknown">номер неизвестен</string>
     <string name="sim_carrier_unknown">оператор неизвестен</string>
     <string name="sim_role_forwarded">пересылается ✓</string>
     <string name="sim_role_ignored">игнор</string>
-    <string name="sim_target_not_found">⚠ SIM с номером …%1$s не найдена. Пока она не определена, пересылаются ВСЕ входящие SMS.</string>
+    <string name="sim_none_selected">⚠ Целевая SIM не выбрана — пересылаются ВСЕ входящие SMS. Нажмите на SIM выше.</string>
 
     <!-- Buttons -->
     <string name="send_test">Отправить тест</string>
