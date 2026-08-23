@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">SMS Forwarder</string>
+
+    <!-- Status line -->
+    <string name="status_no_permissions">Не работает: нет разрешений</string>
+    <string name="status_not_configured">Не настроено: заполните local.properties и пересоберите</string>
+    <string name="status_running">Работает: SMS пересылаются</string>
+
+    <!-- Permissions block -->
+    <string name="permissions_title">Разрешения</string>
+    <string name="permission_sms">Доступ к SMS</string>
+    <string name="permission_sim">Доступ к SIM</string>
+    <string name="grant_permissions">Выдать разрешения</string>
+
+    <!-- Info block -->
+    <string name="info_forwarding_for">Пересылаются SMS для номера …%1$s</string>
+    <string name="info_sending_to">Отправляется на: %1$s</string>
+    <string name="info_not_set">(не настроено)</string>
+
+    <!-- SIM block -->
+    <string name="sim_title">SIM-карты</string>
+    <string name="sim_no_access">Нет доступа к SIM — выдайте разрешения</string>
+    <string name="sim_none">Активные SIM не найдены</string>
+    <string name="sim_row">SIM %1$s (%2$s) — %3$s</string>
+    <string name="sim_number_unknown">номер неизвестен</string>
+    <string name="sim_carrier_unknown">оператор неизвестен</string>
+    <string name="sim_role_forwarded">пересылается ✓</string>
+    <string name="sim_role_ignored">игнор</string>
+    <string name="sim_target_not_found">⚠ SIM с номером …%1$s не найдена. Пока она не определена, пересылаются ВСЕ входящие SMS.</string>
+
+    <!-- Buttons -->
+    <string name="send_test">Отправить тест</string>
+    <string name="test_enqueued">Тестовое письмо поставлено в очередь</string>
+    <string name="disable_battery_optimization">Отключить оптимизацию батареи</string>
+    <string name="battery_hint">Чтобы приложение не «засыпало» на Xiaomi/Samsung и т.п., отключите для него оптимизацию батареи в системных настройках.</string>
+</resources>
