@@ -36,11 +36,26 @@ android {
         buildConfigField("String", "FORWARD_TO", "\"${secret("forwarder.forwardTo")}\"")
     }
 
+    // Release signing config comes from local.properties (kept out of Git).
+    // If no keystore is set, the release build falls back to unsigned/debug.
+    val releaseStore = secret("forwarder.storeFile")
+    signingConfigs {
+        if (releaseStore.isNotBlank()) {
+            create("release") {
+                storeFile = rootProject.file(releaseStore)
+                storePassword = secret("forwarder.storePassword")
+                keyAlias = secret("forwarder.keyAlias")
+                keyPassword = secret("forwarder.keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             optimization {
                 enable = false
             }
+            signingConfig = signingConfigs.findByName("release")
         }
     }
     compileOptions {

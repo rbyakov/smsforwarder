@@ -18,3 +18,12 @@ forwarder.forwardTo=
 # Optional (defaults shown):
 # forwarder.smtpHost=smtp.gmail.com
 # forwarder.smtpPort=587
+
+# Release signing (optional; without it the release build is unsigned).
+# Create a keystore with:
+#   keytool -genkeypair -v -keystore keystore/release.jks -storetype PKCS12 \
+#     -alias release -keyalg RSA -keysize 2048 -validity 10000
+# forwarder.storeFile=keystore/release.jks
+# forwarder.storePassword=your-store-password
+# forwarder.keyAlias=release
+# forwarder.keyPassword=your-key-password
