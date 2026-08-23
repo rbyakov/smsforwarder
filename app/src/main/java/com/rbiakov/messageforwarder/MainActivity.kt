@@ -112,7 +112,11 @@ fun ForwarderScreen(modifier: Modifier = Modifier) {
 
         PermissionsBlock(state) {
             permissionLauncher.launch(
-                arrayOf(Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_PHONE_STATE),
+                arrayOf(
+                    Manifest.permission.RECEIVE_SMS,
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.READ_PHONE_NUMBERS,
+                ),
             )
         }
 

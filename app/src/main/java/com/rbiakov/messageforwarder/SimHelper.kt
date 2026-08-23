@@ -43,7 +43,7 @@ object SimHelper {
         val infos: List<SubscriptionInfo> = try {
             sm.activeSubscriptionInfoList ?: emptyList()
         } catch (e: SecurityException) {
-            Log.w(TAG, "Нет доступа к списку SIM", e)
+            Log.w(TAG, "No access to the SIM list", e)
             return SimState(hasPermission = false, sims = emptyList())
         }
 
@@ -66,16 +66,31 @@ object SimHelper {
 
     @Suppress("DEPRECATION")
     private fun phoneNumber(sm: SubscriptionManager, info: SubscriptionInfo): String {
-        val number = if (Build.VERSION.SDK_INT >= 33) {
-            try {
-                sm.getPhoneNumber(info.subscriptionId)
-            } catch (e: SecurityException) {
-                ""
+        val subId = info.subscriptionId
+        val raw = if (Build.VERSION.SDK_INT >= 33) {
+            // The SIM often doesn't store the MSISDN, so getPhoneNumber(subId) can be
+            // empty. Try every source explicitly: carrier -> UICC (SIM) -> IMS (VoLTE).
+            val sources = listOf(
+                "carrier" to SubscriptionManager.PHONE_NUMBER_SOURCE_CARRIER,
+                "uicc" to SubscriptionManager.PHONE_NUMBER_SOURCE_UICC,
+                "ims" to SubscriptionManager.PHONE_NUMBER_SOURCE_IMS,
+            )
+            var found = ""
+            for ((name, source) in sources) {
+                val value = try {
+                    sm.getPhoneNumber(subId, source)
+                } catch (e: SecurityException) {
+                    ""
+                }
+                Log.d(TAG, "subId=$subId source=$name -> ${if (value.isBlank()) "(empty)" else "present"}")
+                if (found.isBlank() && value.isNotBlank()) found = value
             }
+            found
         } else {
             info.number.orEmpty()
         }
+        Log.d(TAG, "subId=$subId resolved number ${if (raw.isBlank()) "NOT found" else "found"}")
         // Normalize: we compare by suffix, so stripping spaces and dashes is enough.
-        return number.filter { it.isDigit() || it == '+' }
+        return raw.filter { it.isDigit() || it == '+' }
     }
 }
